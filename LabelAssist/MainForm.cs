@@ -9,6 +9,10 @@ namespace LabelAssist
 {
     public partial class MainForm : Form
     {
+
+        private PrintDocument printDocument = new PrintDocument();
+        private string labelToPrint = "";
+
         // Constructor
         public MainForm()
         {
@@ -19,6 +23,8 @@ namespace LabelAssist
 
             // Attach event handler for search
             txtSearch.TextChanged += TxtSearch_TextChanged;
+
+            printDocument.PrintPage += PrintDocument_PrintPage;
         }
 
         // Load all labels into the listbox
@@ -123,42 +129,59 @@ namespace LabelAssist
         // Print selected label
         private void btnPrint_Click(object sender, EventArgs e)
         {
-            if (lstLabels.SelectedItem == null) return;
+            if (lstLabels.SelectedItem == null)
+            {
+                MessageBox.Show(
+                    "Please select a label to print.",
+                    "No Selection",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
 
-            PrintLabel(lstLabels.SelectedItem.ToString());
+            labelToPrint = lstLabels.SelectedItem.ToString();
+
+            using PrintDialog dialog = new PrintDialog();
+            dialog.Document = printDocument;
+            dialog.AllowSomePages = false;
+            dialog.AllowSelection = false;
+
+            // This opens the native Windows print dialog
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                printDocument.Print();
+            }
         }
 
         // Print logic with Windows dialog
-        private void PrintLabel(string text)
+        private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
         {
-            PrintDocument pd = new PrintDocument();
+            Graphics g = e.Graphics;
 
-            // Set custom label size: 50mm x 30mm
-            pd.DefaultPageSettings.PaperSize = new PaperSize("Label", 197, 118); // hundredths of inch
-            pd.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
+            // Label area (adjust to your sticker size)
+            Rectangle labelArea = new Rectangle(50, 50, 300, 150);
 
-            pd.PrintPage += (s, e) =>
+            // Draw border (optional)
+            g.DrawRectangle(Pens.Black, labelArea);
+
+            // Font settings
+            using Font font = new Font("Arial", 16, FontStyle.Bold);
+            StringFormat format = new StringFormat
             {
-                using Font font = new Font("Arial", 14, FontStyle.Bold);
-                StringFormat format = new StringFormat
-                {
-                    Alignment = StringAlignment.Center,
-                    LineAlignment = StringAlignment.Center
-                };
-
-                e.Graphics.DrawString(text.ToUpper(), font, Brushes.Black, e.PageBounds, format);
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Center
             };
 
-            using PrintDialog dlg = new PrintDialog
-            {
-                Document = pd,
-                UseEXDialog = true
-            };
+            // Draw label text
+            g.DrawString(
+                labelToPrint,
+                font,
+                Brushes.Black,
+                labelArea,
+                format
+            );
 
-            if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                pd.Print();
-            }
+            e.HasMorePages = false;
         }
     }
 }

@@ -45,7 +45,7 @@
             txtSearch.Location = new Point(20, 20);
             txtSearch.Name = "txtSearch";
             txtSearch.PlaceholderText = "Search...";
-            txtSearch.Size = new Size(746, 31);
+            txtSearch.Size = new Size(957, 31);
             txtSearch.TabIndex = 0;
             // 
             // lstLabels
@@ -64,9 +64,9 @@
             pnlPreview.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             pnlPreview.BorderStyle = BorderStyle.FixedSingle;
             pnlPreview.Controls.Add(lblPreview);
-            pnlPreview.Location = new Point(464, 60);
+            pnlPreview.Location = new Point(458, 60);
             pnlPreview.Name = "pnlPreview";
-            pnlPreview.Size = new Size(302, 364);
+            pnlPreview.Size = new Size(519, 364);
             pnlPreview.TabIndex = 2;
             // 
             // lblPreview
@@ -125,7 +125,7 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(778, 454);
+            ClientSize = new Size(989, 454);
             Controls.Add(btnPrint);
             Controls.Add(btnDelete);
             Controls.Add(btnEdit);
