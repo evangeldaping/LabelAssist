@@ -1,51 +1,91 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace LabelAssist
 {
     public static class Prompt
     {
-        public static string ShowDialog(string text, string caption)
+        /// <summary>
+        /// Shows an input dialog with optional pre-filled text.
+        /// Returns the entered string or null if cancelled.
+        /// </summary>
+        public static string ShowDialog(
+            string title,
+            string labelText,
+            string defaultText = "")
         {
+            // Create form
             Form prompt = new Form()
             {
                 Width = 400,
-                Height = 150,
-                Text = caption,
-                StartPosition = FormStartPosition.CenterScreen
+                Height = 160,
+                Text = title,
+                StartPosition = FormStartPosition.CenterParent,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                MaximizeBox = false,
+                MinimizeBox = false
             };
 
-            Label lblText = new Label()
+            // Label text
+            Label textLabel = new Label()
             {
-                Left = 20,
-                Top = 20,
-                Text = text,
-                AutoSize = true
+                Left = 10,
+                Top = 15,
+                Width = 360,
+                Text = labelText
             };
 
-            TextBox input = new TextBox()
+            // Input textbox (pre-filled)
+            TextBox inputBox = new TextBox()
             {
-                Left = 20,
-                Top = 50,
-                Width = 340
+                Left = 10,
+                Top = 40,
+                Width = 360,
+                Text = defaultText
             };
 
-            Button ok = new Button()
+            // OK button
+            Button confirmation = new Button()
             {
                 Text = "OK",
-                Left = 280,
-                Width = 80,
+                Left = 210,
+                Width = 75,
                 Top = 80,
                 DialogResult = DialogResult.OK
             };
 
-            prompt.Controls.Add(lblText);
-            prompt.Controls.Add(input);
-            prompt.Controls.Add(ok);
-            prompt.AcceptButton = ok;
+            // Cancel button
+            Button cancel = new Button()
+            {
+                Text = "Cancel",
+                Left = 295,
+                Width = 75,
+                Top = 80,
+                DialogResult = DialogResult.Cancel
+            };
 
+            // Add controls
+            prompt.Controls.Add(textLabel);
+            prompt.Controls.Add(inputBox);
+            prompt.Controls.Add(confirmation);
+            prompt.Controls.Add(cancel);
+
+            // Default buttons
+            prompt.AcceptButton = confirmation;
+            prompt.CancelButton = cancel;
+
+            // Focus textbox and select text
+            prompt.Shown += (sender, e) =>
+            {
+                inputBox.Focus();
+                inputBox.SelectAll();
+            };
+
+            // Show dialog
             return prompt.ShowDialog() == DialogResult.OK
-                ? input.Text
-                : "";
+                ? inputBox.Text.Trim()
+                : null;
         }
     }
 }
