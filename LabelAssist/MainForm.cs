@@ -7,6 +7,14 @@ namespace LabelAssist
 {
     public partial class MainForm : Form
     {
+        private TextBox txtSearch;
+        private ListBox lstLabels;
+        private Panel pnlPreview;
+        private Label lblPreview;
+        private Button btnCreate;
+        private Button btnDelete;
+        private Button btnPrint;
+
         public MainForm()
         {
             InitializeComponent();
