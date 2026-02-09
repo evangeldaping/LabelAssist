@@ -10,6 +10,8 @@ namespace LabelAssist
         {
             // Enables modern Windows visual styles
             ApplicationConfiguration.Initialize();
+            
+            Database.Initialize();
 
             // Start the main window
             Application.Run(new MainForm());
