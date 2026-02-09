@@ -57,7 +57,7 @@
             lstLabels.Name = "lstLabels";
             lstLabels.Size = new Size(432, 304);
             lstLabels.TabIndex = 1;
-            lstLabels.SelectedIndexChanged += lstLabels_SelectedIndexChanged_1;
+            lstLabels.SelectedIndexChanged += lstLabels_SelectedIndexChanged;
             // 
             // pnlPreview
             // 
@@ -89,7 +89,7 @@
             btnCreate.TabIndex = 1;
             btnCreate.Text = "+ Create";
             btnCreate.UseVisualStyleBackColor = true;
-            btnCreate.Click += this.button1_Click;
+            btnCreate.Click += this.btnCreate_Click;
             // 
             // btnEdit
             // 
@@ -109,7 +109,7 @@
             btnDelete.TabIndex = 1;
             btnDelete.Text = "🗑 Delete";
             btnDelete.UseVisualStyleBackColor = true;
-            btnDelete.Click += this.btnDelete_Click_1;
+            btnDelete.Click += this.btnDelete_Click;
             // 
             // btnPrint
             // 
@@ -119,7 +119,7 @@
             btnPrint.TabIndex = 1;
             btnPrint.Text = "🖨 Print";
             btnPrint.UseVisualStyleBackColor = true;
-            btnPrint.Click += this.btnPrint_Click_1;
+            btnPrint.Click += this.btnPrint_Click;
             // 
             // MainForm
             // 
