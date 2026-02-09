@@ -36,6 +36,7 @@
             btnEdit = new Button();
             btnDelete = new Button();
             btnPrint = new Button();
+            cmbLabelSize = new ComboBox();
             pnlPreview.SuspendLayout();
             SuspendLayout();
             // 
@@ -121,11 +122,22 @@
             btnPrint.UseVisualStyleBackColor = true;
             btnPrint.Click += btnPrint_Click;
             // 
+            // cmbLabelSize
+            // 
+            cmbLabelSize.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbLabelSize.FormattingEnabled = true;
+            cmbLabelSize.Items.AddRange(new object[] { "Brother QL 62mm (Auto height)", "50 x 25 mm", "100 x 50 mm", "A4 Page" });
+            cmbLabelSize.Location = new Point(167, 140);
+            cmbLabelSize.Name = "cmbLabelSize";
+            cmbLabelSize.Size = new Size(182, 33);
+            cmbLabelSize.TabIndex = 1;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(989, 454);
+            Controls.Add(cmbLabelSize);
             Controls.Add(btnPrint);
             Controls.Add(btnDelete);
             Controls.Add(btnEdit);
@@ -154,5 +166,6 @@
         private System.Windows.Forms.Button btnEdit;
         private System.Windows.Forms.Button btnDelete;
         private System.Windows.Forms.Button btnPrint;
+        private ComboBox cmbLabelSize;
     }
 }
