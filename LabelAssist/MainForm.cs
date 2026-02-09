@@ -159,7 +159,8 @@ namespace LabelAssist
             Graphics g = e.Graphics;
 
             // Label area (adjust to your sticker size)
-            Rectangle labelArea = new Rectangle(50, 50, 300, 150);
+            Size labelSize = GetLabelSizeInPixels(e.Graphics);
+            Rectangle labelArea = new Rectangle(50, 50, labelSize.Width, labelSize.Height);
 
             // Draw border (optional)
             g.DrawRectangle(Pens.Black, labelArea);
@@ -183,5 +184,25 @@ namespace LabelAssist
 
             e.HasMorePages = false;
         }
+
+        private Size GetLabelSizeInPixels(Graphics g)
+        {
+            float dpiX = g.DpiX;
+            float dpiY = g.DpiY;
+
+            return cmbLabelSize.SelectedIndex switch
+            {
+                0 => new Size(
+                    (int)(50 / 25.4f * dpiX),
+                    (int)(25 / 25.4f * dpiY)),
+
+                1 => new Size(
+                    (int)(100 / 25.4f * dpiX),
+                    (int)(50 / 25.4f * dpiY)),
+
+                _ => g.VisibleClipBounds.Size.ToSize()
+            };
+        }
+
     }
 }
