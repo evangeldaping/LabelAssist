@@ -66,16 +66,38 @@ namespace LabelAssist
         // Edit selected label
         private void btnEdit_Click(object sender, EventArgs e)
         {
-            if (lstLabels.SelectedItem == null) return;
-
-            string current = lstLabels.SelectedItem.ToString();
-            string name = Prompt.ShowDialog("Edit label name:", "Edit Label", current);
-
-            if (!string.IsNullOrWhiteSpace(name))
+            // Make sure something is selected
+            if (lstLabels.SelectedItem == null)
             {
-                LabelRepository.Update(current, name.Trim());
-                LoadLabels();
+                MessageBox.Show(
+                    "Please select a label to edit.",
+                    "No Selection",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
             }
+
+            // Get selected label
+            string oldName = lstLabels.SelectedItem.ToString();
+
+            // Show prompt with pre-filled text
+            string newName = Prompt.ShowDialog(
+                "Edit Label",
+                "Update label name:",
+                oldName);
+
+            // User cancelled or empty input
+            if (string.IsNullOrWhiteSpace(newName) || newName == oldName)
+                return;
+
+            // Update database
+            LabelRepository.Update(oldName, newName);
+
+            // Reload list
+            LoadLabels();
+
+            // Reselect edited item
+            lstLabels.SelectedItem = newName;
         }
 
         // Delete selected label
