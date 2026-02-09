@@ -89,7 +89,7 @@
             btnCreate.TabIndex = 1;
             btnCreate.Text = "+ Create";
             btnCreate.UseVisualStyleBackColor = true;
-            btnCreate.Click += this.btnCreate_Click;
+            btnCreate.Click += btnCreate_Click;
             // 
             // btnEdit
             // 
@@ -109,7 +109,7 @@
             btnDelete.TabIndex = 1;
             btnDelete.Text = "🗑 Delete";
             btnDelete.UseVisualStyleBackColor = true;
-            btnDelete.Click += this.btnDelete_Click;
+            btnDelete.Click += btnDelete_Click;
             // 
             // btnPrint
             // 
@@ -119,7 +119,7 @@
             btnPrint.TabIndex = 1;
             btnPrint.Text = "🖨 Print";
             btnPrint.UseVisualStyleBackColor = true;
-            btnPrint.Click += this.btnPrint_Click;
+            btnPrint.Click += btnPrint_Click;
             // 
             // MainForm
             // 
