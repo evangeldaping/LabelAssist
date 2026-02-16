@@ -9,31 +9,25 @@ namespace LabelAssist
 {
     public partial class MainForm : Form
     {
-
         private PrintDocument printDocument = new PrintDocument();
         private string labelToPrint = "";
+        private int copiesRemaining = 1;
 
-        // Constructor
         public MainForm()
         {
             InitializeComponent();
 
-            // Load all labels when form starts
             LoadLabels();
 
-            // Attach event handler for search
             txtSearch.TextChanged += TxtSearch_TextChanged;
-
             printDocument.PrintPage += PrintDocument_PrintPage;
         }
 
-        // Load all labels into the listbox
         private void LoadLabels()
         {
             lstLabels.Items.Clear();
             List<string> labels = LabelRepository.GetAll();
 
-            // Apply search filter if there is text
             string filter = txtSearch.Text.Trim().ToLower();
             if (!string.IsNullOrEmpty(filter))
             {
@@ -43,25 +37,19 @@ namespace LabelAssist
             lstLabels.Items.AddRange(labels.ToArray());
         }
 
-        // Update label preview when selection changes
         private void lstLabels_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (lstLabels.SelectedItem != null)
-                lblPreview.Text = lstLabels.SelectedItem.ToString();
-            else
-                lblPreview.Text = "Preview";
+            lblPreview.Text = lstLabels.SelectedItem?.ToString() ?? "Preview";
         }
 
-        // Search text changed
         private void TxtSearch_TextChanged(object sender, EventArgs e)
         {
             LoadLabels();
         }
 
-        // Create new label
         private void btnCreate_Click(object sender, EventArgs e)
         {
-            string name = Prompt.ShowDialog("Enter label name:", "New Label");
+            string name = Prompt.ShowDialog("New Label", "Enter label name:");
             if (!string.IsNullOrWhiteSpace(name))
             {
                 LabelRepository.Add(name.Trim());
@@ -69,56 +57,38 @@ namespace LabelAssist
             }
         }
 
-        // Edit selected label
         private void btnEdit_Click(object sender, EventArgs e)
         {
-            // Make sure something is selected
             if (lstLabels.SelectedItem == null)
             {
-                MessageBox.Show(
-                    "Please select a label to edit.",
-                    "No Selection",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+                MessageBox.Show("Please select a label to edit.");
                 return;
             }
 
-            // Get selected label
             string oldName = lstLabels.SelectedItem.ToString();
 
-            // Show prompt with pre-filled text
             string newName = Prompt.ShowDialog(
                 "Edit Label",
                 "Update label name:",
                 oldName);
 
-            // User cancelled or empty input
             if (string.IsNullOrWhiteSpace(newName) || newName == oldName)
                 return;
 
-            // Update database
             LabelRepository.Update(oldName, newName);
-
-            // Reload list
             LoadLabels();
-
-            // Reselect edited item
             lstLabels.SelectedItem = newName;
         }
 
-        // Delete selected label
         private void btnDelete_Click(object sender, EventArgs e)
         {
             if (lstLabels.SelectedItem == null) return;
 
-            var result = MessageBox.Show(
+            if (MessageBox.Show(
                 "Are you sure you want to delete this label?",
                 "Confirm Delete",
                 MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning
-            );
-
-            if (result == DialogResult.Yes)
+                MessageBoxIcon.Warning) == DialogResult.Yes)
             {
                 LabelRepository.Delete(lstLabels.SelectedItem.ToString());
                 LoadLabels();
@@ -126,46 +96,44 @@ namespace LabelAssist
             }
         }
 
-        // Print selected label
         private void btnPrint_Click(object sender, EventArgs e)
         {
             if (lstLabels.SelectedItem == null)
             {
-                MessageBox.Show(
-                    "Please select a label to print.",
-                    "No Selection",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+                MessageBox.Show("Please select a label to print.");
                 return;
             }
 
             labelToPrint = lstLabels.SelectedItem.ToString();
+            copiesRemaining = (int)numCopies.Value;
 
-            using PrintDialog dialog = new PrintDialog();
-            dialog.Document = printDocument;
-            dialog.AllowSomePages = false;
-            dialog.AllowSelection = false;
+            // CRITICAL for Brother QL
+            printDocument.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
+            printDocument.OriginAtMargins = false;
 
-            // This opens the native Windows print dialog
+            using PrintDialog dialog = new PrintDialog
+            {
+                Document = printDocument
+            };
+
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 printDocument.Print();
             }
         }
 
-        // Print logic with Windows dialog
         private void PrintDocument_PrintPage(object sender, PrintPageEventArgs e)
         {
             Graphics g = e.Graphics;
 
-            // Label area (adjust to your sticker size)
-            Size labelSize = GetLabelSizeInPixels(e.Graphics);
-            Rectangle labelArea = new Rectangle(50, 50, labelSize.Width, labelSize.Height);
+            Size labelSize = GetLabelSizeInPixels(g);
 
-            // Draw border (optional)
-            g.DrawRectangle(Pens.Black, labelArea);
+            Rectangle labelArea = new Rectangle(
+                0,
+                0,
+                labelSize.Width,
+                labelSize.Height);
 
-            // Font settings
             using Font font = new Font("Arial", 16, FontStyle.Bold);
             StringFormat format = new StringFormat
             {
@@ -173,16 +141,15 @@ namespace LabelAssist
                 LineAlignment = StringAlignment.Center
             };
 
-            // Draw label text
             g.DrawString(
                 labelToPrint,
                 font,
                 Brushes.Black,
                 labelArea,
-                format
-            );
+                format);
 
-            e.HasMorePages = false;
+            copiesRemaining--;
+            e.HasMorePages = copiesRemaining > 0;
         }
 
         private Size GetLabelSizeInPixels(Graphics g)
@@ -190,18 +157,56 @@ namespace LabelAssist
             float dpiX = g.DpiX;
             float dpiY = g.DpiY;
 
-            return cmbLabelSize.SelectedIndex switch
+            // Brother QL-570 62mm tape (dynamic height)
+            if (cmbLabelSize.SelectedIndex == 0)
             {
-                0 => new Size(
+                int widthPx = (int)(62 / 25.4f * dpiX);
+
+                using Font font = new Font("Arial", 16, FontStyle.Bold);
+                SizeF textSize = g.MeasureString(labelToPrint, font);
+
+                int heightPx = (int)textSize.Height + 40;
+
+                return new Size(widthPx, heightPx);
+            }
+
+            // 50 x 25 mm
+            if (cmbLabelSize.SelectedIndex == 1)
+            {
+                return new Size(
                     (int)(50 / 25.4f * dpiX),
-                    (int)(25 / 25.4f * dpiY)),
+                    (int)(25 / 25.4f * dpiY));
+            }
 
-                1 => new Size(
-                    (int)(100 / 25.4f * dpiX),
-                    (int)(50 / 25.4f * dpiY)),
+            // 100 x 50 mm
+            return new Size(
+                (int)(100 / 25.4f * dpiX),
+                (int)(50 / 25.4f * dpiY));
+        }
 
-                _ => g.VisibleClipBounds.Size.ToSize()
+        private void pnlPreview_Paint(object sender, PaintEventArgs e)
+        {
+            if (lstLabels.SelectedItem == null) return;
+
+            Graphics g = e.Graphics;
+            g.Clear(Color.White);
+
+            Rectangle rect = new Rectangle(10, 10, pnlPreview.Width - 20, pnlPreview.Height - 20);
+            g.DrawRectangle(Pens.Black, rect);
+
+            using Font font = new Font("Arial", 12, FontStyle.Bold);
+            StringFormat format = new StringFormat
+            {
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Center
             };
+
+            g.DrawString(
+                lstLabels.SelectedItem.ToString(),
+                font,
+                Brushes.Black,
+                rect,
+                format);
         }
 
     }
