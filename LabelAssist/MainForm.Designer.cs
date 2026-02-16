@@ -37,7 +37,9 @@
             btnDelete = new Button();
             btnPrint = new Button();
             cmbLabelSize = new ComboBox();
+            numCopies = new NumericUpDown();
             pnlPreview.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)numCopies).BeginInit();
             SuspendLayout();
             // 
             // txtSearch
@@ -46,7 +48,7 @@
             txtSearch.Location = new Point(20, 20);
             txtSearch.Name = "txtSearch";
             txtSearch.PlaceholderText = "Search...";
-            txtSearch.Size = new Size(957, 31);
+            txtSearch.Size = new Size(432, 31);
             txtSearch.TabIndex = 0;
             // 
             // lstLabels
@@ -69,6 +71,7 @@
             pnlPreview.Name = "pnlPreview";
             pnlPreview.Size = new Size(519, 364);
             pnlPreview.TabIndex = 2;
+            pnlPreview.Paint += pnlPreview_Paint;
             // 
             // lblPreview
             // 
@@ -127,16 +130,26 @@
             cmbLabelSize.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbLabelSize.FormattingEnabled = true;
             cmbLabelSize.Items.AddRange(new object[] { "Brother QL 62mm (Auto height)", "50 x 25 mm", "100 x 50 mm", "A4 Page" });
-            cmbLabelSize.Location = new Point(167, 140);
+            cmbLabelSize.Location = new Point(459, 18);
             cmbLabelSize.Name = "cmbLabelSize";
-            cmbLabelSize.Size = new Size(182, 33);
+            cmbLabelSize.Size = new Size(295, 33);
             cmbLabelSize.TabIndex = 1;
+            // 
+            // numCopies
+            // 
+            numCopies.Location = new Point(795, 23);
+            numCopies.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numCopies.Name = "numCopies";
+            numCopies.Size = new Size(182, 31);
+            numCopies.TabIndex = 3;
+            numCopies.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(989, 454);
+            Controls.Add(numCopies);
             Controls.Add(cmbLabelSize);
             Controls.Add(btnPrint);
             Controls.Add(btnDelete);
@@ -152,6 +165,7 @@
             Text = "LabelAssist - Product Label Printing";
             pnlPreview.ResumeLayout(false);
             pnlPreview.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)numCopies).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -167,5 +181,6 @@
         private System.Windows.Forms.Button btnDelete;
         private System.Windows.Forms.Button btnPrint;
         private ComboBox cmbLabelSize;
+        private NumericUpDown numCopies;
     }
 }
